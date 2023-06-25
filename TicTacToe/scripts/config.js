@@ -2,6 +2,7 @@ function openPlayerConfig(event) {
     editedPlayer = +event.target.dataset.playerid; // +'1' = 1
     playerConfigOverlayElement.style.display = 'block';
     backdropElement.style.display = 'block';
+    formElement.firstElementChild.lastElementChild.focus();
 }
 
 function closePlayerConfig() {
