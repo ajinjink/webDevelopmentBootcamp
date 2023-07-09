@@ -5,23 +5,25 @@ const express = require('express');
 
 const app = express();
 
+app.set('views', path.join(__dirname, 'views')); // which engine?, path(views dir)
+// let express know where it will find the template files that we want to process with the template engine
+app.set('view engine', 'ejs'); // can set options for express. engine, name of engine
+
 app.use(express.static('public')); // for every incoming requests, it should check if it is a request to files in public folder
 // if not, check the following
 app.use(express.urlencoded({extended: false}));
 
 app.get('/', function(req, res) {
-    const htmlFilePath = path.join(__dirname, 'views', 'index.html');
-    res.sendFile(htmlFilePath);
+    res.render('index'); // render template
+    // pasrse a template with a template engine, convert it to html, and send to browser
 });
 
 app.get('/restaurants', function(req, res) {
-    const htmlFilePath = path.join(__dirname, 'views', 'restaurants.html');
-    res.sendFile(htmlFilePath);
+    res.render('restaurants'); 
 });
 
 app.get('/recommend', function(req, res) {
-    const htmlFilePath = path.join(__dirname, 'views', 'recommend.html');
-    res.sendFile(htmlFilePath);
+    res.render('recommend'); 
 });
 app.post('/recommend', function(req, res) {
     const restaurant = req.body;
@@ -38,13 +40,11 @@ app.post('/recommend', function(req, res) {
 });
 
 app.get('/confirm', function(req, res) {
-    const htmlFilePath = path.join(__dirname, 'views', 'confirm.html');
-    res.sendFile(htmlFilePath);
+    res.render('confirm'); 
 });
 
 app.get('/about', function(req, res) {
-    const htmlFilePath = path.join(__dirname, 'views', 'about.html');
-    res.sendFile(htmlFilePath);
+    res.render('about'); 
 });
 
 
