@@ -7,11 +7,27 @@ const resData = require('../utility/restaurant-data'); // path. require own file
 const router = express.Router();
 
 router.get('/restaurants', function(req, res) { // only when access is through exactly '/restaurants'
+    let order = req.query.order;
+    if (order !== 'asc' && order !== 'desc') {
+        order = 'asc';
+    }
+    let nextOrder = 'desc';
+    if (order === 'desc') nextOrder = 'asc';
+
     const storedRestaurants = resData.getStoredRestaurants();
+
+    storedRestaurants.sort(function(resA, resB) { // compare func
+        if (
+            (order === 'asc' && resA.name > resB.name) || 
+            (order === 'desc' && resB.name > resA.name)
+            ) return 1; // flip
+        else return -1;
+    });
 
     res.render('restaurants', {
         numberOfRestaurants: storedRestaurants.length, 
-        restaurants: storedRestaurants
+        restaurants: storedRestaurants,
+        nextOrder: nextOrder
     }); 
 });
 
