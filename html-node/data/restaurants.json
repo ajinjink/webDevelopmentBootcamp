@@ -1,5 +1,1 @@
-[
-    {"name":"Test","address":"Teststreet 5, Testcity","cuisine":"Italian","website":"https://testpage.com","description":"good"},
-    {"name":"Test2","address":"Teststreet 10, Testcity 2","cuisine":"Indian","website":"https://test2.com","description":"amazing"},
-    {"name":"restaurant 3","address":"street 30","cuisine":"German","website":"https://whatever.com","description":"nice"}
-]
+[{"name":"Test","address":"Teststreet 5, Testcity","cuisine":"Italian","website":"https://testpage.com","description":"good","id":"r1"},{"name":"Test2","address":"Teststreet 10, Testcity 2","cuisine":"Indian","website":"https://test2.com","description":"amazing","id":"r2"},{"name":"restaurant 3","address":"street 30","cuisine":"German","website":"https://whatever.com","description":"nice","id":"r3"},{"name":"fine restaurant","address":"greatstreet 5","cuisine":"German","website":"https://great.cpm","description":"it's good","id":"1bf84c0b-07ce-400a-97e6-13918e0878a9"}]
