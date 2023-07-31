@@ -19,9 +19,15 @@ cook.describe();
 
 
 
+// arr destructuring
+// const input = ['Jina', 'Kim'];
+// const FN = input[0];
+// const LN = input[1];
+// const [first, last] = input;
+// console.log(first, last);
 
-const input = ['Jina', 'Kim'];
-const FN = input[0];
-const LN = input[1];
-const [first, last] = input;
-console.log(first, last);
+// object destructuring
+// const job = {title: 'developer', location:'new york'};
+// // const {title, location} = job; // extract all
+// const {title} = job; // extract some (has to have the same name as the property)
+// const {title: jTitle} = job; // extract title as name jTitle
