@@ -39,5 +39,5 @@ async function readFile() {
 readFile();
 
 // if the sync task takes long time, the lines below have delay 
-// use async functions if the task to be manages by synching takes long
+// use async functions if the task to be managed by synching takes long
 // reading files/db, talking to http req -> takes long
