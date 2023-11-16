@@ -10,9 +10,13 @@
 </head>
 <body>
   <main id="new-user">
-    <form action="/profiles" method="POST">
+    <form action="/profiles" method="POST" enctype="multipart/form-data">
+      <!-- encryption type -->
+      <!-- default : application/x-www-form-urlencoded -->
+      <!-- including files : multipart/form-data -->
       <div class="form-control">
         <label for="username">Username</label>
+        <input type="text" id="username" name="username" required accept="image/jpg,image/png, iamge/jpeg">
       </div>
       <div class="form-control">
         <label for="image">User image</label>
