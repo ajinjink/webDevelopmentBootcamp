@@ -25,13 +25,18 @@ async function fetchCommentsForPost(event) {
     const postId = loadCommentsBtnElement.dataset.postid;
     const response = await fetch(`/posts/${postId}/comments`); // url of get request
     const responseData = await response.json(); // browser method. parse json -> js object
-    
-    const commentsListElement = createCommentsList(responseData);
-    commentsSectionElement.innerHTML = ''; // clear
-    commentsSectionElement.appendChild(commentsListElement);
+
+    if (responseData && responseData.lengtrh > 0) {
+        const commentsListElement = createCommentsList(responseData);
+        commentsSectionElement.innerHTML = ''; // clear
+        commentsSectionElement.appendChild(commentsListElement);
+    }
+    else {
+        commentsSectionElement.firstElementChild.textContent = "We could not find any comments. Add a comment.";
+    }
 }
 
-function saveComment(event) {
+async function saveComment(event) {
     event.preventDefault();
     const postId = commentsFormElement.dataset.postid;
 
@@ -40,7 +45,7 @@ function saveComment(event) {
 
     const comment = {title: enteredTitle, text: enteredText};
     
-    fetch(`/posts/${postId}/comments`, {
+    const response = await fetch(`/posts/${postId}/comments`, {
         method: 'POST', // default GET
         body: JSON.stringify(comment), // json format data
         headers: {
@@ -48,6 +53,10 @@ function saveComment(event) {
         }
     });
     // have to set meta data for the middleware to notice it is json encoded
+    // not interested in response
+    // interested in "waiting"
+
+    fetchCommentsForPost();
 }
  
 loadCommentsBtnElement.addEventListener('click', fetchCommentsForPost);
