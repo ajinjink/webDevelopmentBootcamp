@@ -116,13 +116,15 @@ router.post('/posts/:id/delete', async function (req, res) {
 
 router.get('/posts/:id/comments', async function (req, res) {
   const postId = new ObjectId(req.params.id);
-  const post = await db.getDb().collection('posts').findOne({ _id: postId });
+  // 페이지 전체를 재로드 하는 게 아니라 일부만 다시 가져오기 때문에 post는 안 가져와도 됨
+  // const post = await db.getDb().collection('posts').findOne({ _id: postId });
   const comments = await db
     .getDb()
     .collection('comments')
     .find({ postId: postId }).toArray();
 
-  return res.render('post-detail', { post: post, comments: comments });
+  res.json(comments); // express library method (just like render)
+  // encode data as json to send it back as response  
 });
 
 router.post('/posts/:id/comments', async function (req, res) {
