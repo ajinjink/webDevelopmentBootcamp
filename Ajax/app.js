@@ -11,7 +11,11 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+// look at header. meta data of encoding req body
+// meta data : urlencoded
 app.use(express.urlencoded({ extended: true })); // Parse incoming request bodies
+// meta data : json encoded
+app.use(express.json()); // Parse all incoming requests if they are josn format, parse json
 app.use(express.static('public')); // Serve static files (e.g. CSS files)
 
 app.use(blogRoutes);

@@ -1,5 +1,8 @@
 const loadCommentsBtnElement = document.getElementById('load-comments-btn');
 const commentsSectionElement = document.getElementById('comments');
+const commentsFormElement = document.querySelector('#comments-form form');
+const commentTitleElement = document.getElementById('title');
+const commentTextElement = document.getElementById('text');
 
 function createCommentsList(comments) { // make comments arr into list
     const commentListElement = document.createElement('ol');
@@ -28,4 +31,24 @@ async function fetchCommentsForPost(event) {
     commentsSectionElement.appendChild(commentsListElement);
 }
 
+function saveComment(event) {
+    event.preventDefault();
+    const postId = commentsFormElement.dataset.postid;
+
+    const enteredTitle = commentTitleElement.value;
+    const enteredText = commentTextElement.value;
+
+    const comment = {title: enteredTitle, text: enteredText};
+    
+    fetch(`/posts/${postId}/comments`, {
+        method: 'POST', // default GET
+        body: JSON.stringify(comment), // json format data
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    // have to set meta data for the middleware to notice it is json encoded
+}
+ 
 loadCommentsBtnElement.addEventListener('click', fetchCommentsForPost);
+commentsFormElement.addEventListener('submit', saveComment);
