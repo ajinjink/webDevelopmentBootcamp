@@ -23,16 +23,28 @@ function createCommentsList(comments) { // make comments arr into list
 
 async function fetchCommentsForPost(event) {
     const postId = loadCommentsBtnElement.dataset.postid;
-    const response = await fetch(`/posts/${postId}/comments`); // url of get request
-    const responseData = await response.json(); // browser method. parse json -> js object
 
-    if (responseData && responseData.lengtrh > 0) {
-        const commentsListElement = createCommentsList(responseData);
-        commentsSectionElement.innerHTML = ''; // clear
-        commentsSectionElement.appendChild(commentsListElement);
+    try {
+        const response = await fetch(`/posts/${postId}/comments`); // url of get request
+    
+        if (!response.ok) {
+            alert('Fethcing comments failed!');
+            return;
+        }
+    
+        const responseData = await response.json(); // browser method. parse json -> js object
+    
+        if (responseData && responseData.lengtrh > 0) {
+            const commentsListElement = createCommentsList(responseData);
+            commentsSectionElement.innerHTML = ''; // clear
+            commentsSectionElement.appendChild(commentsListElement);
+        }
+        else {
+            commentsSectionElement.firstElementChild.textContent = "We could not find any comments. Add a comment.";
+        }
     }
-    else {
-        commentsSectionElement.firstElementChild.textContent = "We could not find any comments. Add a comment.";
+    catch (error) { // technical errors
+        alert('Getting comments failed!');
     }
 }
 
@@ -45,18 +57,29 @@ async function saveComment(event) {
 
     const comment = {title: enteredTitle, text: enteredText};
     
-    const response = await fetch(`/posts/${postId}/comments`, {
-        method: 'POST', // default GET
-        body: JSON.stringify(comment), // json format data
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-    // have to set meta data for the middleware to notice it is json encoded
-    // not interested in response
-    // interested in "waiting"
+    try {
+        const response = await fetch(`/posts/${postId}/comments`, {
+            method: 'POST', // default GET
+            body: JSON.stringify(comment), // json format data
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        // have to set meta data for the middleware to notice it is json encoded
+        // not interested in response
+        // interested in "waiting"
 
-    fetchCommentsForPost();
+        if (response.ok) {
+            fetchCommentsForPost();
+        }
+        else { // can't access db
+            alert('Could not send comment!');
+        }
+    }
+    catch (error) { // technical reasons (no network)
+        alert('Could not send request - maybe try again later!');
+    }
+
 }
  
 loadCommentsBtnElement.addEventListener('click', fetchCommentsForPost);
