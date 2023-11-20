@@ -27,7 +27,10 @@ app.use(session({
   secret: 'super-secret', // key used internally for securing session(cookie). session can't be faked
   resave: false, // session is only updated in the db when the data is actually changed (not for each incoming req)
   saveUninitialized: false, // session is stored in db when data exists
-  store: sessionStore // where it should be stored
+  store: sessionStore, // where it should be stored
+  // cookie: {
+  //   maxAge: 30 * 24 * 60 * 60 * 1000 // session expiration in milliseconds
+  // }
 }));
 
 app.use(demoRoutes);

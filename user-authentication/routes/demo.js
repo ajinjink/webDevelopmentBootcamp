@@ -78,6 +78,10 @@ router.post('/login', async function (req, res) {
 });
 
 router.get('/admin', function (req, res) {
+  // check user authentication (session ticket)
+  if (!req.session.authenticated) { // if (!req.session.user)
+    return res.status(401).render('401'); // not authenticated
+  }
   res.render('admin');
 });
 
