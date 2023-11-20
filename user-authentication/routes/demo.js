@@ -12,6 +12,7 @@ router.get('/', function (req, res) {
 router.get('/signup', function (req, res) {
   // 이전에 정보를 잘못 기입해서 다시 로드된 창이면
   let sessionInputData = req.session.inputData;
+
   if (!sessionInputData) { // 이전 정보가 없으면
     sessionInputData = {
       hasError: false,
@@ -27,7 +28,17 @@ router.get('/signup', function (req, res) {
 });
 
 router.get('/login', function (req, res) {
-  res.render('login');
+  let sessionInputData = req.session.inputData;
+
+  if (!sessionInputData) {
+    sessionInputData = {
+      hasError: false,
+      email: '',
+      password: ''
+    };
+  }
+  
+  res.render('login', {inputData: sessionInputData});
 });
 
 router.post('/signup', async function (req, res) {
@@ -58,8 +69,18 @@ router.post('/signup', async function (req, res) {
 
   const existingUser = await db.getDb().collection('users').findOne({email: enteredEmail});
   if (existingUser) {
+    req.session.inputData = {
+      hasError: true,
+      message: 'User exists already!',
+      email: enteredEmail,
+      confirmEmail: enteredConfirmEmail,
+      password: enteredPassword
+    };
     console.log('User exitsts already.');
-    return res.redirect('/signup');
+    req.session.save(function() {
+      res.redirect('/signup');
+    });
+    return;
   }
 
   const hashedPassword = await bcrypt.hash(enteredPassword, 12); // 암호화 할 대상, 암호화 강도
@@ -81,14 +102,32 @@ router.post('/login', async function (req, res) {
 
   const existingUser = await db.getDb().collection('users').findOne({email: enteredEmail});
   if (!existingUser) {
+    req.session.inputData = {
+      hasError: true,
+      message: 'Could not log in - please check your credentials.',
+      email: enteredEmail,
+      password: enteredPassword
+    };
     console.log('Login failed. Invalid email');
-    return res.redirect('/login');
+    req.session.save(function() {
+      res.redirect('/login');
+    });
+    return;
   }
 
   const passwordEqual = await bcrypt.compare(enteredPassword, existingUser.password); // unhashed, hashed
   if (!passwordEqual) {
+    req.session.inputData = {
+      hasError: true,
+      message: 'Invalid input - please check your data.',
+      email: enteredEmail,
+      password: enteredPassword
+    };
     console.log('Login failed. Wrong password');
-    return res.redirect('/login');
+    req.session.save(function() {
+      res.redirect('/login');
+    });
+    return;
   }
 
   req.session.user = { id: existingUser._id, email: existingUser.email }; // can access/create session data
@@ -98,18 +137,32 @@ router.post('/login', async function (req, res) {
   // db access slow. redirect가 먼저 끝날 수도 있음
   req.session.save(function() { // 권한이 있어야 하는 페이지로 redirect 했는데, 세션 아직 저장 안 된 상황 방지
     // only runs when saving is finished
-    res.redirect('/admin');
+    res.redirect('/profile');
   }); // force session to be saved in db
 
   console.log('Login Succeeded');
 });
 
-router.get('/admin', function (req, res) {
+router.get('/admin', async function (req, res) {
   // check user authentication (session ticket)
   if (!req.session.authenticated) { // if (!req.session.user)
     return res.status(401).render('401'); // not authenticated
   }
+
+  const user = await db.getDb().collection('users').findOne({_id: req.session.user.id});
+  if (!user || !user.isAdmin) {
+    res.status(403).render('403');
+  }
+
   res.render('admin');
+});
+
+router.get('/profile', function (req, res) {
+  // check user authentication (session ticket)
+  if (!req.session.authenticated) { // if (!req.session.user)
+    return res.status(401).render('401'); // not authenticated
+  }
+  res.render('profile');
 });
 
 router.post('/logout', function (req, res) {
