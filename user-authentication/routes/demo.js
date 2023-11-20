@@ -64,8 +64,17 @@ router.post('/login', async function (req, res) {
     return res.redirect('/login');
   }
 
+  req.session.user = { id: existingUser._id, email: existingUser.email }; // can access/create session data
+  req.session.authenticated = true;
+  // session written to db
+  // for all response sent, express-session automatically save sessions to db
+  // db access slow. redirect가 먼저 끝날 수도 있음
+  req.session.save(function() { // 권한이 있어야 하는 페이지로 redirect 했는데, 세션 아직 저장 안 된 상황 방지
+    // only runs when saving is finished
+    res.redirect('/admin');
+  }); // force session to be saved in db
+
   console.log('Login Succeeded');
-  res.redirect('/admin');
 });
 
 router.get('/admin', function (req, res) {
