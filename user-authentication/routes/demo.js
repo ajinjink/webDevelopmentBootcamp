@@ -10,7 +10,20 @@ router.get('/', function (req, res) {
 });
 
 router.get('/signup', function (req, res) {
-  res.render('signup');
+  // 이전에 정보를 잘못 기입해서 다시 로드된 창이면
+  let sessionInputData = req.session.inputData;
+  if (!sessionInputData) { // 이전 정보가 없으면
+    sessionInputData = {
+      hasError: false,
+      email: '',
+      confirmEmail: '',
+      password: ''
+    };
+  }
+
+  req.session.inputData = null;
+
+  res.render('signup', {inputData: sessionInputData});
 });
 
 router.get('/login', function (req, res) {
@@ -26,7 +39,21 @@ router.post('/signup', async function (req, res) {
   if (!enteredEmail || !enteredConfirmEmail || !enteredPassword || 
     enteredPassword.trim() < 6 || enteredEmail !== enteredConfirmEmail || !enteredEmail.includes('@')) {
       console.log("Incorrect data input");
-      return res.redirect('/signup');
+      
+      req.session.inputData = { // 정보 잘못 기입했을 때, 기존에 기입한 정보 그대로 다시 표시 -> 필요한 부분만 수정
+        hasError: true,
+        message: 'Invalid input - please check your data.',
+        email: enteredEmail,
+        confirmEmail: enteredConfirmEmail,
+        password: enteredPassword
+      }; // 기입된 정보 저장
+      // 여기서는 세션이 사용자 인증과는 관련 없음
+
+      req.session.save(function() { // 저장이 완료되고 나서 redirect
+        res.redirect('/signup'); // render 하면 이 양식을 다시 보내겠냐는 확인창 뜸
+      }); // 이 안에서 return을 하면 이 익명 함수만 끝나고 아래는 그대로 진행됨
+      return;
+
   }
 
   const existingUser = await db.getDb().collection('users').findOne({email: enteredEmail});
