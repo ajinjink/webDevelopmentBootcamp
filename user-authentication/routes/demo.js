@@ -37,7 +37,9 @@ router.get('/login', function (req, res) {
       password: ''
     };
   }
-  
+
+  req.session.inputData = null;
+
   res.render('login', {inputData: sessionInputData});
 });
 
@@ -145,13 +147,13 @@ router.post('/login', async function (req, res) {
 
 router.get('/admin', async function (req, res) {
   // check user authentication (session ticket)
-  if (!req.session.authenticated) { // if (!req.session.user)
+  if (!res.locals.isAuth) { // if (!req.session.user)
     return res.status(401).render('401'); // not authenticated
   }
 
   const user = await db.getDb().collection('users').findOne({_id: req.session.user.id});
-  if (!user || !user.isAdmin) {
-    res.status(403).render('403');
+  if (!res.locals.isAdmin) {
+    return res.status(403).render('403');
   }
 
   res.render('admin');
@@ -159,7 +161,7 @@ router.get('/admin', async function (req, res) {
 
 router.get('/profile', function (req, res) {
   // check user authentication (session ticket)
-  if (!req.session.authenticated) { // if (!req.session.user)
+  if (!res.locals.isAuth) { // if (!req.session.user)
     return res.status(401).render('401'); // not authenticated
   }
   res.render('profile');

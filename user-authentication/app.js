@@ -33,11 +33,27 @@ app.use(session({
   // }
 }));
 
+app.use(async function(req, res, next) { // user defined middleware
+  const user = req.session.user;
+  const isAuth = req.session.authenticated;
+  
+  if (!user || !isAuth) {
+    return next(); // middleware should be forwarded to the next middleware route in line(demoRoutes)
+  }
+  const userDoc = await db.getDb().collection('users').findOne({_id: user.id});
+  const isAdmin = userDoc.isAdmin;
+  
+  res.locals.isAuth = isAuth; // set global values that will be available through entire req res for this cycle
+  res.locals.isAdmin = isAdmin;
+
+  next();
+});
+
 app.use(demoRoutes);
 
 app.use(function(error, req, res, next) {
   res.render('500');
-})
+});
 
 db.connectToDatabase().then(function () {
   app.listen(5000);
